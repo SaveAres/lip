@@ -56,13 +56,50 @@ let state0 = make_state [bottom_env] bottom_mem 0
 (* Definizione Conf *)
 type conf = St of state | Cmd of cmd * state
 
+(* Funzioni di Controllo Tipo *)
+let is_a_state : conf -> bool = function
+  | St(_) -> true
+  | Cmd(_,_) -> false
+;;
+
+let is_integer_variable = function
+  | IVar(_) -> true
+  | BVar(_) -> false
+;;
+
+let is_ivar : envval -> bool = function
+  | IVar(_) -> true
+  | BVar(_) -> false
+;;
+
+let is_integer_value : memval -> bool = function
+  | Int(_) -> true
+  | Bool(_) -> false
+;;
+
 (* Funzioni di conversione *)
-let iloc_of_envval : envval -> loc = function
+let loc_of_envval : envval -> loc = function
   | IVar(loc) -> loc
-  | BVar(_) -> raise (TypeError "Variables must contain integer values.")
+  | BVar(loc) -> loc
 ;;
 
 let int_of_memval : memval -> int = function
   | Int(x) -> x
-  | Bool(_) -> raise (TypeError "Variables only contain integer values.")
+  | Bool(_) -> raise (TypeError "Integer operations must contain integer value.")
 ;;
+
+let bool_of_memval : memval -> bool = function
+  | Bool(x) -> x
+  | Int(_) -> raise (TypeError "Boolean operations must contain boolean value.")
+;;
+
+let extract_state : conf -> state = function
+  | Cmd(_, s) -> s
+  | St(s) -> s
+;;
+
+let extract_cmd : conf -> cmd = function
+  | Cmd(c, _) -> c
+  | St(_) -> raise (TypeError "Impossibile recuperare il prossimo comando.")
+;;
+

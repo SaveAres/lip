@@ -27,6 +27,7 @@ open Ast
 %token BOOLDECL
 %token LBRACE
 %token RBRACE
+%token SKIP
 %token EOF 
 
 %left OR
@@ -54,7 +55,7 @@ cmd:
   | WHILE; e = expr; DO; c = cmd { While(e, c) }
   | LPAREN; e = cmd; RPAREN { e }
   | LBRACE; d = decls; subBlock = cmd; RBRACE { Decl(d, subBlock) }
-  | { Skip }
+  | SKIP { Skip }
 ;
 
 expr:

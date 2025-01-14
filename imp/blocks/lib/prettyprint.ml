@@ -24,9 +24,9 @@ let string_of_decl = function
   | BoolVar x -> "bool " ^ x
 
 let rec string_of_decl_list = function
-  | [] -> ""
-  | [ d ] -> string_of_decl d
-  | d :: ds -> string_of_decl d ^ ";" ^ string_of_decl_list ds
+  | [] -> " "
+  | [ d ] -> string_of_decl d ^ "; "
+  | d :: ds -> string_of_decl d ^ "; " ^ string_of_decl_list ds
 
 let rec string_of_cmd = function
     Skip -> "skip"

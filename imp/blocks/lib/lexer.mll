@@ -30,6 +30,7 @@ let intDecl = "int"
 let boolDecl = "bool"
 let lbrace = "{"
 let rbrace = "}"
+let skip = "skip"
 
 rule read = parse
   | white { read lexbuf }  
@@ -56,6 +57,7 @@ rule read = parse
   | boolDecl { BOOLDECL }
   | lbrace { LBRACE }
   | rbrace { RBRACE }
+  | skip { SKIP }
   | var { VAR (Lexing.lexeme lexbuf) }
   | num { CONST (Lexing.lexeme lexbuf) }
   | eof { EOF }
