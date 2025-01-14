@@ -44,4 +44,6 @@ let rec loop () =
 
 let _ =
   print_endline "Exit with Ctrl+C\nGenerating words...\n";
+  print_endline (derive balanced_parentheses [ 0; 2; 1; 3; 1; 2; 3; 0; 3; 3; 3; 3 ] |> string_of_sentform);
+  print_endline "\n\n\n";
   loop ()

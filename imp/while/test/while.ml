@@ -3,6 +3,12 @@ open WhileLib.Types
 open WhileLib.Prettyprint       
 open WhileLib.Main
 
+(*
+(test
+ (name while)
+ (libraries while))
+*)
+
 (**********************************************************************
  parse test : (variable, term, expected result)
  **********************************************************************)

@@ -1,4 +1,4 @@
-open AndboolexprLib.Main
+open Andboolexpr.Main
 
 (* read file, and output it to a string *)
 

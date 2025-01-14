@@ -1,3 +1,4 @@
+(* Definizione Tipi dell'Albero di Sintassi Astratto *)
 type ide = string
 
 type expr =

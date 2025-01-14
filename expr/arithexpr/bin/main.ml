@@ -1,4 +1,5 @@
-open ArithexprLib.Main
+open Arithexpr.Main
+open Arithexpr.Ast
   
 (* read file, and output it to a string *)
 
@@ -16,8 +17,12 @@ let read_line () =
 ;;
 
 (* print a result *)
+let string_of_exprval = function
+  | Bool(e) -> string_of_bool e
+  | Nat(e) -> string_of_int e 
+;;
 
-let print_val e = print_string (string_of_val e); print_newline();;
+let print_val e = print_string (string_of_exprval e); print_newline();;
 
 (* print a trace *)
 

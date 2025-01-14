@@ -1,5 +1,50 @@
+(* Apertura Moduli *)
 module T = ANSITerminal
 open Printf
+open Ast
+
+(* Tipo Rule, Conway e metodo di estrazione dei valori survive/born *)
+type rule = Rule of int list * int list 
+let conway = Rule([2;3],[3])
+
+let extract rule i = match rule with
+  | Rule(s,_) when i=1 -> s
+  | Rule(_,b) when i=2 -> b
+  | _ -> []
+;;
+
+(* Funzione di parsing *)
+let parse (s : string) : ast =
+  let lexbuf = Lexing.from_string s in
+  let ast = Parser.prog Lexer.read_token lexbuf in
+  ast
+
+(* eval: ast -> rule *)
+(* conway ast: Survive(Const(2), Survive(Const(3), Born(Const(3), Nothing))) *)
+(* conway rule: ([2;3],[3]) *)
+let int_of_const x = match x with
+  | Const(a) -> a
+  | _ -> failwith "Const must contain numbers"
+;;
+
+let rec born_eval ast = match ast with
+  | Survive(_,l) -> born_eval l
+  | Born(a, l) -> (int_of_const a) :: born_eval l
+  | _ -> []
+;;
+
+let rec survive_eval ast = match ast with
+  | Survive(a, l) -> (int_of_const a) :: survive_eval l
+  | _ -> []
+;;
+
+let eval ast = Rule((survive_eval ast), (born_eval ast))
+
+(* check_rule: int list -> int -> bool *)
+let rec check_rule (list : int list) (alive_nb : int) = match list with
+  | a::l -> (alive_nb=a) || check_rule l alive_nb
+  | [] -> false
+;;
 
 (* let rec range a b = if b<a then [] else a::(range (a+1) b) *)
 
@@ -46,23 +91,23 @@ let count1 l = List.fold_left (fun s x -> s + (if x then 1 else 0)) 0 l
 
 let count w = List.fold_left (fun s x -> s + count1 x) 0 w
 
-let alive w i j =
+(* alive: bool list list -> int -> int -> rule -> bool *)
+let alive w i j rule =
   let (cell,nb) = neighbours w i j in
   let alive_nb = count nb in
-  if cell then (* cell is alive *)
-    (* cell survives? *)
-    alive_nb = 2 || alive_nb = 3
-  else (* cell is dead *)
-    (* cell is born? *)
-    alive_nb = 3
+  if cell then (* cell is alive. cell survives? *)
+    check_rule (extract rule 1) alive_nb
+  else (* cell is dead. cell is born? *)
+    check_rule (extract rule 2) alive_nb
 
-let step1 w i =
-  let n = List.length w in
-  List.mapi (fun j _ -> alive w i j) (zeroes n)
 
-let step w =
+let step1 w i rule =
   let n = List.length w in
-  List.mapi (fun i _ -> step1 w i) (zeroes n)
+  List.mapi (fun j _ -> alive w i j rule) (zeroes n)
+
+let step w rule =
+  let n = List.length w in
+  List.mapi (fun i _ -> step1 w i rule) (zeroes n)
 
 (* let step w = List.map step1 w *)
 (* let step w = w *)
@@ -74,6 +119,12 @@ let display w =
   printf "%s\n%!" (string_of_world w);
   Unix.sleepf 0.15;;
 
-let rec loop w n =
+let rec loop w n rule =
   if n=0 then (display w; w)
-  else (display w; loop (step w) (n-1))
+  else (display w; loop (step w rule) (n-1) rule)
+
+(* conversione da int list -> string *)
+let rec string_of_intlist list = match list with
+  | a::l -> (string_of_int a) ^ " " ^ string_of_intlist l
+  | [] -> ""
+;;

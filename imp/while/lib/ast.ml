@@ -1,3 +1,4 @@
+(* Definizione Tipi *)
 type ide = string
   
 type expr =
@@ -20,4 +21,3 @@ type cmd =
   | Seq of cmd * cmd
   | If of expr * cmd * cmd
   | While of expr * cmd
-

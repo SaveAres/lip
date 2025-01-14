@@ -1,7 +1,7 @@
+(* Apertura Moduli bin/ *)
 open Tugofwar
     
 (* read one line from standard input, and output it to a string *)
-
 let read_line () =
   try Some(read_line())
   with End_of_file -> None

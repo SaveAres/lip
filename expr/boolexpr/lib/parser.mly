@@ -9,7 +9,13 @@ open Ast
 %token IF
 %token THEN
 %token ELSE
+%token AND
+%token OR
 %token EOF
+
+%left OR
+%left AND
+%left ELSE
 
 %start <boolExpr> prog
 
@@ -22,7 +28,9 @@ prog:
 expr:
   | TRUE { True }
   | FALSE { False }
-  | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr; { If(e1, e2, e2) }
-  | LPAREN; e=expr; RPAREN {e}
+  | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If(e1, e2, e3) }
+  | e1 = expr; AND; e2 = expr { If(e1, e2, False) }
+  | e1 = expr; OR; e2 = expr { If(e1, True, e2) }
+  | LPAREN; e=expr; RPAREN { e }
 ;
 
