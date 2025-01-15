@@ -1,0 +1,28 @@
+
+** Conflict (shift/reduce) in state 53.
+** Tokens involved: WHILE VAR SKIP LPAREN LBRACE IF
+** The following explanations concentrate on token WHILE.
+** This state is reached from prog after reading:
+
+WHILE expr DO LBRACE
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+cmd EOF 
+(?)
+
+** In state 53, looking ahead at WHILE, shifting is permitted
+** because of the following sub-derivation:
+
+WHILE expr DO LBRACE cmd RBRACE 
+                     . WHILE expr DO LBRACE cmd RBRACE 
+
+** In state 53, looking ahead at WHILE, reducing production
+** decls ->
+** is permitted because of the following sub-derivation:
+
+WHILE expr DO cmd 
+              LBRACE decls cmd RBRACE // lookahead token appears because cmd can begin with WHILE
+                     . 

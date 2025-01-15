@@ -45,8 +45,20 @@ let rec eval_decl (st:state) = function
 (* Small-Step: Funzioni di Trace *) 
 let rec trace1 (n:int) = function
   | Cmd(Block(Decl(decl_list, prog)), st) when (n > 0) -> Cmd(prog, (eval_decl st decl_list))  (* Blocco con dichiarazioni *)
+
   | Cmd(Block(cmd), st) when (n > 0) -> Cmd(cmd, st)                                           (* Blocco senza dichiarazioni *)
-  | Cmd(Skip, st) when (n>0) -> St(st)
+                                         
+  | Cmd(Decl(decl_list, prog), st) when (n > 0) ->                                             (* Sottoblocco *)
+    if (decl_list != []) then                                                                  (* Sottoblocco con dichiarazioni *)
+      let subBlock = Block(Decl(decl_list, prog)) in
+      Cmd(Seq(subBlock, Skip), st)
+    else
+      Cmd(prog, st)                                                                            (* Sottoblocco senza dichiarazioni *)
+
+  | Cmd(Skip, st) when (n>0) ->                                                                (* Uscita Sottoblocco *)
+    let exitBlockSt = setenv st (popenv st) in
+    St(exitBlockSt)
+
   | Cmd(Seq(cmd1, cmd2), st) when (n > 0) ->
     let step = trace1 (n-1) (Cmd(cmd1, st)) in
     if (is_a_state step) then         (* Seq_St *)
@@ -56,14 +68,18 @@ let rec trace1 (n:int) = function
       let st' = extract_state step in
       let c1' = extract_cmd step in
       trace1 (n-1) (Cmd(Seq(c1', cmd2), st'))
+
   | Cmd(Assign(name, e), st) when (n > 0) -> 
     let memoria = getmem st in
     let loc = (loc_of_envval ((topenv st) name)) in
     let value = eval_expr st e in
     let type_check = ((is_integer_variable ((topenv st) name)) = (is_integer_value value)) in (* Controllo che il tipo sia coerente con la dichiarazione*)
     if (type_check) then St(setmem st (bind_mem memoria loc value)) else raise (TypeError "Error: inconsistent variable assignment.s")
+
   | Cmd(If(e, cmd1, cmd2), s) -> if (bool_of_memval (eval_expr s e)) then Cmd(cmd1, s) else Cmd(cmd2, s)
+
   | Cmd(While(e, cmd), s) -> if (bool_of_memval (eval_expr s e)) then Cmd(Seq(cmd, While(e,cmd)), s) else St(s)
+
   | _ -> raise NoRuleApplies
 ;;
 

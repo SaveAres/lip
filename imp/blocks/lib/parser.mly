@@ -49,13 +49,12 @@ prog:
 ;
 
 cmd:
+  | SKIP { Skip }
   | v = VAR; ASSIGN; e = expr { Assign(v, e) }
   | c1 = cmd; SEQ; c2 = cmd { Seq(c1,c2) }
   | IF; e = expr; THEN; c1 = cmd; ELSE; c2 = cmd { If(e, c1, c2) }
   | WHILE; e = expr; DO; c = cmd { While(e, c) }
-  | LPAREN; e = cmd; RPAREN { e }
   | LBRACE; d = decls; subBlock = cmd; RBRACE { Decl(d, subBlock) }
-  | SKIP { Skip }
 ;
 
 expr:
