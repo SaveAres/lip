@@ -117,3 +117,38 @@ let bind_ivar (st : state) x v =
 
 (** The type of small-step semantics configurations. *)
 type conf = St of state | Cmd of cmd * state
+
+(* Funzioni di Controllo *)
+let is_a_state : conf -> bool = function
+  | St(_) -> true
+  | Cmd(_,_) -> false
+;;
+
+(* Funzioni di Conversione *)
+let extract_state : conf -> state = function
+  | Cmd(_, s) -> s
+  | St(s) -> s
+;;
+
+let extract_cmd : conf -> cmd = function
+  | Cmd(c, _) -> c
+  | St(_) -> raise (TypeError "Impossibile recuperare il prossimo comando.")
+;;
+
+let extract_declarations = function
+    | Prog(decl_list, _) -> decl_list
+;;  
+  
+let extract_cmds = function  
+  | Prog(_, cmd) -> cmd
+;;
+
+let iloc_of_envval : envval -> loc = function
+  | IVar(loc) -> loc
+  | _ -> raise (TypeError "Variables must contain integer values.")
+;;
+
+let int_of_memval : memval -> int = function
+  | x -> x
+;;
+
